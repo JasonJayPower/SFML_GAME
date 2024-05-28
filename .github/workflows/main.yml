@@ -23,6 +23,9 @@ jobs:
     - name: Initialize and update submodules
       run: |
         git submodule update --init --recursive
+        cd path/to/submodule
+        git checkout 84e807598d245c658ffe3cc02c61ad0ec13a1d2f
+        cd -
 
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
