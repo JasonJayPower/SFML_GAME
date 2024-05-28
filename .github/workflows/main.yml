@@ -20,9 +20,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Initialize and update submodules
+    - name: Pull & update submodules recursively
       run: |
-        git submodule update --init --recursive
+      	git submodule update --init --recursive
+      	git submodule update --recursive --remote
 
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
@@ -30,7 +31,7 @@ jobs:
         arch: x64
 
     - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --config Release
