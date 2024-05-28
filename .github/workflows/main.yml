@@ -34,7 +34,7 @@ jobs:
     - name: Extract Version from README
       id: extract-version
       run: |
-        version=$(grep -o 'Version [0-9]\+\.[0-9]\+\.[0-9]\+' README | awk '{print $2}')
+        $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         echo "version=${version}" >> $GITHUB_ENV
 
     - name: Create ZIP Archive
