@@ -53,12 +53,16 @@ jobs:
       shell: powershell
 
 
+    - name: Create lightweight tag
+      run: git tag v${{ steps.extract-version.outputs.version }}
+
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: actions/create-release@v3
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        tag_name: v${{ steps.extract-version.outputs.version }}
         release_name: Release ${{ steps.extract-version.outputs.version }}
-        files: |
-          build/Release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
+    - name: Delete lightweight tag
+      run: git tag -d v${{ steps.extract-version.outputs.version }}
