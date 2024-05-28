@@ -37,6 +37,16 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
+    - name: Check directory contents
+      run: |
+        ls -al build/Release
+      shell: pwsh
+
+    - name: Echo extracted version
+      run: |
+        echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
+      shell: pwsh
+
     - name: Create ZIP Archive
       run: |
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
@@ -44,6 +54,7 @@ jobs:
       shell: pwsh
 
     - name: Upload Artifact
+      if: success()
       uses: actions/upload-artifact@v3
       with:
         name: sfml-game
