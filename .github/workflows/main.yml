@@ -38,7 +38,7 @@ jobs:
     - name: Extract Version from README
       id: extract-version
       run: |
-	version=$(grep -o 'Version [0-9]\+\.[0-9]\+\.[0-9]\+' README | awk '{print $2}')
+        version=$(grep -o 'Version [0-9]\+\.[0-9]\+\.[0-9]\+' README | awk '{print $2}')
         echo "::set-output name=version::$version"
 
     - name: Create TAR Archive
