@@ -10,10 +10,8 @@ project(SFML_GAME
 # Global flag to cause add_library() to create shared libraries if on.
 set(BUILD_SHARED_LIBS FALSE)
 
-# Add the directory containing SFML to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{VCPKG_INSTALLED_DIR}/installed/x64-windows)
-
-find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
+#Adds a subdirectory to the build.
+add_subdirectory(libs/sfml)
 
 # File manipulation command. (Automatically checks and finds all source files at build time)
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS "src/*.cpp")
