@@ -34,3 +34,22 @@ jobs:
 
     - name: Build
       run: cmake --build build --config Release
+
+    - name: Extract Version from README
+      id: extract-version
+      run: |
+        version=$(grep -m1 -oP 'Version \K\d+\.\d+\.\d+' README)
+        echo "::set-output name=version::$version"
+
+    - name: Create TAR Archive
+      run: |
+        cd build/Release
+        tar -cvf SFML_GAME-${{ steps.extract-version.outputs.version }}.tar SFML_GAME.exe
+        mv SFML_GAME-${{ steps.extract-version.outputs.version }}.tar ../../../sfml-game-${{ steps.extract-version.outputs.version }}.tar
+      shell: bash
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: sfml-game
+        path: SFML_GAME-${{ steps.extract-version.outputs.version }}.tar
