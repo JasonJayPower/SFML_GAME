@@ -50,13 +50,13 @@ jobs:
     - name: Create lightweight tag
       run: git tag v${{ steps.extract-version.outputs.version }}
 
-  - name: Create Release
-    id: create_release
-    uses: actions/create-release@v1
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    with:
-      tag_name: v${{ steps.extract-version.outputs.version }}
-      release_name: Release ${{ steps.extract-version.outputs.version }}
-      files: |
-        build/Release/SFML_GAME.exe
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.extract-version.outputs.version }}
+        release_name: Release ${{ steps.extract-version.outputs.version }}
+        files: |
+          build/Release/SFML_GAME.exe
