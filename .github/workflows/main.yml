@@ -73,6 +73,7 @@ jobs:
         release_name: Release ${{ steps.extract-version.outputs.version }}
 
     - name: Upload Release Asset
+      if: success() && steps.create_release.outputs.upload_url != ''
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
