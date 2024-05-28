@@ -37,20 +37,6 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
-    - name: Create and Push Tag
-      run: |
-        TAG_NAME="${{ steps.extract-version.outputs.version }}"
-        if git rev-parse --verify --quiet "$TAG_NAME"; then
-          echo "Tag $TAG_NAME already exists."
-          exit 1
-        else
-          git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      shell: bash
-
     - name: Create Artifact
       run: |
         New-Item -ItemType Directory -Path release
