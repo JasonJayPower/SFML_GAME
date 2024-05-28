@@ -56,5 +56,5 @@ jobs:
     - name: Publish Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SFML_GAME
+        name: SFML_GAME-${{ steps.extract-version.outputs.version }}
         path: release
