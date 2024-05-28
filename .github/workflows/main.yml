@@ -37,6 +37,12 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
+    - name: Create Artifact
+      run: |
+        New-Item -ItemType Directory -Path release
+        Copy-Item -Path build\Release\SFML_GAME.exe -Destination release\SFML_GAME.exe
+      shell: powershell
+      
     - name: Check directory contents
       run: |
         Get-ChildItem -Path build/Release
