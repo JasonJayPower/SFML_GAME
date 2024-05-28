@@ -34,21 +34,22 @@ jobs:
     - name: Extract Version from README
       id: extract-version
       run: |
-        $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
-        Write-Output "::set-output name=version::$version"
+        $version = (Select-String -Path README.md -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
+        echo "version=$version" >> $GITHUB_ENV
 
-    - name: Echo extracted version
+    - name: Check if Tag Exists
+      id: check-tag
       run: |
-        echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
-      shell: pwsh
+        if git rev-parse --verify --quiet "v${{ env.version }}"; then
+          echo "Tag v${{ env.version }} already exists."
+          exit 1
+        fi
+      shell: bash
 
-    - name: Check directory contents
+    - name: Create ZIP Archive
       run: |
-        Get-ChildItem -Path build/Release
-      shell: pwsh
-
-    - name: Create lightweight tag
-      run: git tag v${{ steps.extract-version.outputs.version }}
+        Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ env.version }}.zip"
+      shell: powershell
 
     - name: Create Release
       id: create_release
@@ -56,7 +57,17 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.extract-version.outputs.version }}
-        release_name: Release ${{ steps.extract-version.outputs.version }}
-        files: |
-          build/Release/SFML_GAME.exe
+        tag_name: v${{ env.version }}
+        release_name: Release ${{ env.version }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: SFML_GAME-${{ env.version }}.zip
+        asset_name: SFML_GAME-${{ env.version }}.zip
+        asset_content_type: application/zip
