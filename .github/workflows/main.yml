@@ -64,12 +64,17 @@ jobs:
         tag_name: v${{ steps.extract-version.outputs.version }}
         release_name: Release ${{ steps.extract-version.outputs.version }}
 
+    - name: Get Artifact Path
+      id: get_artifact_path
+      run: echo "::set-output name=artifact_path::$(find release -name 'SFML_GAME-*.zip')"
+
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ steps.publish_artifact.outputs.artifact_path }}
+        asset_path: ${{ steps.get_artifact_path.outputs.artifact_path }}
         asset_name: SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
         asset_content_type: application/zip
+        
