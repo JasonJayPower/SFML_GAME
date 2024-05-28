@@ -30,7 +30,7 @@ jobs:
         arch: x64
 
     - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake
 
     - name: Build
       run: cmake --build build --config Release
