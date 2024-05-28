@@ -37,11 +37,6 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
-    - name: Check directory contents
-      run: |
-        Get-ChildItem -Path build/Release
-      shell: pwsh
-
     - name: Echo extracted version
       run: |
         echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
@@ -52,6 +47,10 @@ jobs:
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
       shell: powershell
 
+    - name: Check directory contents
+      run: |
+        Get-ChildItem -Path build/Release
+      shell: pwsh
 
     - name: Create lightweight tag
       run: git tag v${{ steps.extract-version.outputs.version }}
