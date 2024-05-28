@@ -25,9 +25,10 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
+        .\vcpkg\vcpkg integrate install
 
-    - name: Install SFML
-      run: .\vcpkg\vcpkg install sfml@2.5.1
+    - name: Install dependencies
+      run: .\vcpkg\vcpkg install --feature-flags=manifests
 
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake
