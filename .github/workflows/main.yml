@@ -35,12 +35,13 @@ jobs:
       id: extract-version
       run: |
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
-        echo "version=${version}" >> $GITHUB_ENV
+        Write-Output "::set-output name=version::$version"
 
     - name: Create ZIP Archive
       run: |
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
-        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "..\..\..\..\sfml-game-${{ steps.extract-version.outputs.version }}.zip"
+        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "../../../../../sfml-game-${{ steps.extract-version.outputs.version }}.zip"
+      shell: pwsh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
