@@ -29,6 +29,10 @@ jobs:
         .\vcpkg integrate install
 
     - name: Install dependencies
-      run: |
-        .\vcpkg\vcpkg install sfml
-        echo "SFML installed at: $env:VCPKG_INSTALLED_DIR\installed\x64-windows"
+      run: .\vcpkg\vcpkg install --feature-flags=manifests
+
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release
