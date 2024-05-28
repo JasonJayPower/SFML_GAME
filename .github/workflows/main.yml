@@ -37,15 +37,19 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
-    - name: Check directory contents
+    - name: Create and Push Tag
       run: |
-        Get-ChildItem -Path build/Release
-      shell: pwsh
-
-    - name: Echo extracted version
-      run: |
-        echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
-      shell: pwsh
+        TAG_NAME="${{ steps.extract-version.outputs.version }}"
+        if git rev-parse --verify --quiet "$TAG_NAME"; then
+          echo "Tag $TAG_NAME already exists."
+          exit 1
+        else
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
 
     - name: Create Artifact
       run: |
@@ -58,3 +62,14 @@ jobs:
       with:
         name: SFML_GAME-${{ steps.extract-version.outputs.version }}
         path: release
+
+
+    - name: Upload Release Asset
+    uses: actions/upload-release-asset@v4
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      asset_path: SFML_GAME-${{ env.version }}.zip
+      asset_name: SFML_GAME-${{ env.version }}.zip
+      asset_content_type: application/zip
