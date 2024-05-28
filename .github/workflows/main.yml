@@ -70,6 +70,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
+        asset_path: release
         asset_name: SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
         asset_content_type: application/zip
