@@ -20,10 +20,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Pull & update submodules recursively
+    - name: Initialize and update submodules
       run: |
-      	git submodule update --init --recursive
-      	git submodule update --recursive --remote
+        git submodule update --init --recursive
 
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
