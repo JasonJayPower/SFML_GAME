@@ -55,7 +55,6 @@ jobs:
         name: SFML_GAME-${{ steps.extract-version.outputs.version }}
         path: release
 
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
