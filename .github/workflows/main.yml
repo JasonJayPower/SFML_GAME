@@ -46,6 +46,7 @@ jobs:
         cd build/Release
         tar -cvf SFML_GAME-${{ steps.extract-version.outputs.version }}.tar SFML_GAME.exe
         mv SFML_GAME-${{ steps.extract-version.outputs.version }}.tar ../../../sfml-game-${{ steps.extract-version.outputs.version }}.tar
+      shell: cmd
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
