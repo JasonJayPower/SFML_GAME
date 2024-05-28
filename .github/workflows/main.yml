@@ -47,7 +47,7 @@ jobs:
         echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
       shell: pwsh
 
-    - name: Create ZIP Archive
+    - name: Compress SFML_GAME.exe into ZIP
       run: |
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
         if (-not (Test-Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip")) {
@@ -55,8 +55,8 @@ jobs:
           exit 1
         }
         Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "../../../sfml-game-${{ steps.extract-version.outputs.version }}.zip"
-      shell: pwsh
-      
+      shell: powershell
+  
     - name: Upload Artifact
       if: success()
       uses: actions/upload-artifact@v3
