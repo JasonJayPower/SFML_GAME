@@ -50,16 +50,11 @@ jobs:
     - name: Compress SFML_GAME.exe into ZIP
       run: |
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
-        if (-not (Test-Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip")) {
-          Write-Output "ZIP file not found."
-          exit 1
-        }
-        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "../../../SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
       shell: powershell
 
     - name: Upload Artifact
       if: success()
       uses: actions/upload-artifact@v3
       with:
-        name: SFML_GAME-
-        path: SFML_GAME--${{ steps.extract-version.outputs.version }}.zip
+        name: SFML_GAME
+        path: build/Release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
