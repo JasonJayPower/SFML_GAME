@@ -63,10 +63,8 @@ jobs:
         name: SFML_GAME-${{ steps.extract-version.outputs.version }}
         path: release
 
-
-
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v4
+      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
