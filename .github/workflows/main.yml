@@ -12,10 +12,6 @@ jobs:
   build:
     runs-on: windows-latest
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -43,9 +39,8 @@ jobs:
 
     - name: Create ZIP Archive
       run: |
-        cd build/Release
-        zip -r SFML_GAME-${{ steps.extract-version.outputs.version }}.zip SFML_GAME.exe
-        mv SFML_GAME-${{ steps.extract-version.outputs.version }}.zip ../../../../sfml-game-${{ steps.extract-version.outputs.version }}.zip
+        Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
+        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "..\..\..\..\sfml-game-${{ steps.extract-version.outputs.version }}.zip"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
