@@ -37,6 +37,21 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
+    - name: Check if Tag Exists
+      id: check-tag
+      run: |
+        if git rev-parse --verify --quiet "v${{ steps.extract-version.outputs.version }}"; then
+          echo "::set-output name=tag_exists::true"
+        else
+          echo "::set-output name=tag_exists::false"
+        fi
+
+    - name: Tag Build
+      if: steps.check-tag.outputs.tag_exists != 'true'
+      run: |
+        git tag -a v${{ steps.extract-version.outputs.version }} -m "Version ${{ steps.extract-version.outputs.version }}"
+        git push origin v${{ steps.extract-version.outputs.version }}
+
     - name: Check directory contents
       run: |
         Get-ChildItem -Path build/Release
@@ -52,9 +67,20 @@ jobs:
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
       shell: powershell
 
-    - name: Upload Artifact
-      if: success()
-      uses: actions/upload-artifact@v3
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        name: SFML_GAME
-        path: build/Release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
+        tag_name: v${{ steps.extract-version.outputs.version }}
+        release_name: Release ${{ steps.extract-version.outputs.version }}
+        body: |
+          Changes in this Release
+          - Add feature X
+          - Fix bug Y
+        draft: false
+        prerelease: false
+        files: |
+          build/Release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
