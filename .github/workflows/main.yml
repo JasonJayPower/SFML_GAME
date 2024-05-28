@@ -50,7 +50,7 @@ jobs:
     - name: Create ZIP Archive
       run: |
         Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
-        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "../../../../../sfml-game-${{ steps.extract-version.outputs.version }}.zip"
+        Move-Item -Path "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip" -Destination "../../../sfml-game-${{ steps.extract-version.outputs.version }}.zip"
       shell: pwsh
 
     - name: Upload Artifact
