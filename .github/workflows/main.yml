@@ -39,7 +39,7 @@ jobs:
 
     - name: Check directory contents
       run: |
-        ls -al build/Release
+        Get-ChildItem -Path build/Release
       shell: pwsh
 
     - name: Echo extracted version
