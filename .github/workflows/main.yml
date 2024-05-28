@@ -37,21 +37,6 @@ jobs:
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
 
-    - name: Check if Tag Exists
-      id: check-tag
-      run: |
-        if (git rev-parse --verify --quiet "v${{ steps.extract-version.outputs.version }}") {
-          echo "::set-output name=tag_exists::true"
-        } else {
-          echo "::set-output name=tag_exists::false"
-        }
-
-    - name: Tag Build
-      if: steps.check-tag.outputs.tag_exists != 'true'
-      run: |
-        git tag -a v${{ steps.extract-version.outputs.version }} -m "Version ${{ steps.extract-version.outputs.version }}"
-        git push origin v${{ steps.extract-version.outputs.version }}
-
     - name: Check directory contents
       run: |
         Get-ChildItem -Path build/Release
@@ -74,13 +59,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: v${{ steps.extract-version.outputs.version }}
         release_name: Release ${{ steps.extract-version.outputs.version }}
-        body: |
-          Changes in this Release
-          - Add feature X
-          - Fix bug Y
-        draft: false
-        prerelease: false
         files: |
           build/Release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
