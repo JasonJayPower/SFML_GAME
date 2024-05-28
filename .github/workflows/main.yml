@@ -42,11 +42,6 @@ jobs:
         echo "Extracted version: ${{ steps.extract-version.outputs.version }}"
       shell: pwsh
 
-    - name: Compress SFML_GAME.exe into ZIP
-      run: |
-        Compress-Archive -Path "build/Release/SFML_GAME.exe" -DestinationPath "SFML_GAME-${{ steps.extract-version.outputs.version }}.zip"
-      shell: powershell
-
     - name: Check directory contents
       run: |
         Get-ChildItem -Path build/Release
@@ -55,13 +50,13 @@ jobs:
     - name: Create lightweight tag
       run: git tag v${{ steps.extract-version.outputs.version }}
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.extract-version.outputs.version }}
-        release_name: Release ${{ steps.extract-version.outputs.version }}
-    - name: Delete lightweight tag
-      run: git tag -d v${{ steps.extract-version.outputs.version }}
+  - name: Create Release
+    id: create_release
+    uses: actions/create-release@v1
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tag_name: v${{ steps.extract-version.outputs.version }}
+      release_name: Release ${{ steps.extract-version.outputs.version }}
+      files: |
+        build/Release/SFML_GAME.exe
