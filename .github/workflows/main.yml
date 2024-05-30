@@ -1,4 +1,4 @@
-name: build_project
+name: Build SFML Game
 
 on:
   push:
@@ -8,23 +8,22 @@ on:
     branches:
       - main
 
-defaults:
-  run:
-    shell: powershell
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Initialize and update submodules
-      run: |
-        git submodule update --init --recursive
+      run: git submodule update --init --recursive
 
     - name: Set up MSVC
+      if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
@@ -49,15 +48,24 @@ jobs:
       run: |
         $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
         Write-Output "::set-output name=version::$version"
+      shell: pwsh
 
     - name: Create Artifact
       run: |
-        New-Item -ItemType Directory -Path release
-        Copy-Item -Path build\Release\SFML_GAME.exe -Destination release\SFML_GAME.exe
-      
+        mkdir -p release
+        cp build/Release/SFML_GAME.exe release/SFML_GAME.exe
+      shell: bash
+
     - name: Zip Build Output
       run: |
-        Compress-Archive -Path release/* -DestinationPath release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          zip -r release/SFML_GAME_Windows-${{ steps.extract-version.outputs.version }}.zip release/*
+        elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          zip -r release/SFML_GAME_Ubuntu-${{ steps.extract-version.outputs.version }}.zip release/*
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          zip -r release/SFML_GAME_macOS-${{ steps.extract-version.outputs.version }}.zip release/*
+        fi
+      shell: bash
 
     - name: Create Release
       id: create_release
@@ -68,12 +76,24 @@ jobs:
         tag_name: v${{ steps.extract-version.outputs.version }}
         release_name: Release ${{ steps.extract-version.outputs.version }}
 
+    - name: Set Asset Path and Name
+      id: set-asset-info
+      run: |
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          echo "::set-output name=asset_os::Windows"
+        elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "::set-output name=asset_os::Ubuntu"
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "::set-output name=asset_os::macOS"
+        fi
+      shell: bash
+
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
-        asset_name: SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
+        asset_path: release/SFML_GAME_${{ steps.set-asset-info.outputs.asset_os }}-${{ steps.extract-version.outputs.version }}.zip
+        asset_name: SFML_GAME_${{ steps.set-asset-info.outputs.asset_os }}-${{ steps.extract-version.outputs.version }}.zip
         asset_content_type: application/zip
