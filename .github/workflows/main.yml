@@ -10,18 +10,38 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest]
-
+  release:
+    runs-on: windows-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
 
+    - name: Extract Version from README
+      id: extract-version
+      run: |
+          $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
+          Write-Output "::set-output name=version::$version"
+      shell: pwsh
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.extract-version.outputs.version }}
+        release_name: Release ${{ steps.extract-version.outputs.version }}
+
+  build:
+    needs: release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        
+    steps:
     - name: Set up MSVC
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
@@ -38,13 +58,6 @@ jobs:
       run: |
         find . -name SFML_GAME
       shell: bash
-
-    - name: Extract Version from README
-      id: extract-version
-      run: |
-        $version = (Select-String -Path README -Pattern 'Version \d+\.\d+\.\d+' | Select-Object -First 1).Matches.Value -replace 'Version ', ''
-        Write-Output "::set-output name=version::$version"
-      shell: pwsh
 
     - name: Create Artifact
       run: |
@@ -64,15 +77,6 @@ jobs:
           zip -r release/SFML_GAME_macOS-${{ steps.extract-version.outputs.version }}.zip release/*
         fi
       shell: bash
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.extract-version.outputs.version }}
-        release_name: Release ${{ steps.extract-version.outputs.version }}
 
     - name: Set Asset Path and Name
       id: set-asset-info
