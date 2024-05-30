@@ -1,4 +1,4 @@
-name: Build SFML Game
+name: build_project
 
 on:
   push:
@@ -8,13 +8,17 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    shell: powershell
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     - name: Initialize and update submodules
       run: |
@@ -24,6 +28,15 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
+
+    - name: Cache CMake
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cmake
+        key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-
 
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
@@ -41,17 +54,10 @@ jobs:
       run: |
         New-Item -ItemType Directory -Path release
         Copy-Item -Path build\Release\SFML_GAME.exe -Destination release\SFML_GAME.exe
-      shell: powershell
       
-    - name: Check directory contents
-      run: |
-        Get-ChildItem -Path build/Release
-      shell: pwsh
-
     - name: Zip Build Output
       run: |
         Compress-Archive -Path release/* -DestinationPath release/SFML_GAME-${{ steps.extract-version.outputs.version }}.zip
-      shell: powershell
 
     - name: Create Release
       id: create_release
