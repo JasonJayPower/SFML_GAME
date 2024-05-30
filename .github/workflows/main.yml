@@ -59,11 +59,9 @@ jobs:
     - name: Create Zip
       run: |
         if [[ "${{ runner.os }}" == "Windows" ]]; then
-          powershell Compress-Archive -Path release/* -DestinationPath release/SFML_GAME_Windows-1.0.3.zip
-        elif [[ "${{ runner.os }}" == "Linux" ]]; then
-          zip -r release/SFML_GAME_Ubuntu-1.0.3.zip release/*
+          powershell Compress-Archive -Path release/* -DestinationPath release/SFML_GAME_Windows-${{ steps.extract-version.outputs.version }}.zip
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          zip -r release/SFML_GAME_macOS-1.0.3.zip release/*
+          zip -r release/SFML_GAME_macOS-${{ steps.extract-version.outputs.version }}.zip release/*
         fi
       shell: bash
 
