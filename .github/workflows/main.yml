@@ -30,8 +30,8 @@ jobs:
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
-    - name: Build
-      run: cmake --build build --config Release
+    - name: Configure CMake
+      run: cmake -B build/release -S . -DCMAKE_BUILD_TYPE=Release
 
     - name: Find SFML_GAME
       run: |
@@ -49,9 +49,9 @@ jobs:
       run: |
         mkdir -p release
         if [[ "${{ runner.os }}" == "Windows" ]]; then
-          cp build/Release/SFML_GAME.exe release/SFML_GAME.exe
+          cp build/release/SFML_GAME.exe release/SFML_GAME.exe
         else
-          cp build/Release/SFML_GAME release/SFML_GAME
+          cp build/release/SFML_GAME release/SFML_GAME
         fi
       shell: bash
 
