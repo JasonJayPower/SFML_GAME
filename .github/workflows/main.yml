@@ -56,14 +56,14 @@ jobs:
         fi
       shell: bash
 
-    - name: Zip Build Output
+    - name: Create Zip
       run: |
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-          zip -r release/SFML_GAME_Windows-${{ steps.extract-version.outputs.version }}.zip release/*
-        elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-          zip -r release/SFML_GAME_Ubuntu-${{ steps.extract-version.outputs.version }}.zip release/*
-        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-          zip -r release/SFML_GAME_macOS-${{ steps.extract-version.outputs.version }}.zip release/*
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          powershell Compress-Archive -Path release/* -DestinationPath release/SFML_GAME_Windows-1.0.3.zip
+        elif [[ "${{ runner.os }}" == "Linux" ]]; then
+          zip -r release/SFML_GAME_Ubuntu-1.0.3.zip release/*
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          zip -r release/SFML_GAME_macOS-1.0.3.zip release/*
         fi
       shell: bash
 
