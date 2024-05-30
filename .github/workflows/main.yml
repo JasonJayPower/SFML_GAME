@@ -27,20 +27,16 @@ jobs:
       with:
         arch: x64
 
-    - name: Cache CMake
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cmake
-        key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cmake-
-
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --config Release
+
+    - name: Find SFML_GAME
+      run: |
+        find . -name SFML_GAME
+      shell: bash
 
     - name: Extract Version from README
       id: extract-version
