@@ -52,7 +52,11 @@ jobs:
     - name: Create Artifact
       run: |
         mkdir -p release
-        cp build/Release/SFML_GAME.exe release/SFML_GAME.exe
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          cp build/Release/SFML_GAME.exe release/SFML_GAME.exe
+        else
+          cp build/Release/SFML_GAME release/SFML_GAME
+        fi
       shell: bash
 
     - name: Zip Build Output
